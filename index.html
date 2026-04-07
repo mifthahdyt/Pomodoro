@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deep Focus | Zen Pomodoro</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;400;700&display=swap');
+
+        :root {
+            --bg-dark: #050505;
+            --glass: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --accent: #ffffff;
+            --text-dim: #a0a0a0;
+            --glow-color: rgba(255, 255, 255, 0.5);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: white;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* --- BACKGROUND EFFECTS --- */
+        .bg-image {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('latar.jpg') no-repeat center center/cover;
+            z-index: -3;
+            transform: scale(1.1);
+            filter: brightness(0.4) grayscale(0.5);
+        }
+
+        .vignette {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, transparent 20%, rgba(0,0,0,0.8) 100%);
+            z-index: -2;
+        }
+
+        #stars-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* --- GLASS CARD --- */
+        .glass-card {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            padding: 60px 40px;
+            border-radius: 40px;
+            width: 90%;
+            max-width: 450px;
+            text-align: center;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            position: relative;
+            z-index: 10;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 100px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: var(--text-dim);
+            margin-bottom: 20px;
+            border: 1px solid var(--glass-border);
+        }
+
+        .timer-display {
+            font-size: 6.5rem;
+            font-weight: 200;
+            margin: 10px 0;
+            letter-spacing: -4px;
+            line-height: 1;
+            text-shadow: 0 0 30px var(--glow-color);
+        }
+
+        .session-info {
+            color: var(--text-dim);
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        /* --- PROGRESS CIRCLE --- */
+        .progress-wrapper {
+            margin: 30px auto;
+            position: relative;
+            width: 100%;
+            height: 4px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, transparent, #fff, transparent);
+            background-size: 200% 100%;
+            animation: moveGradient 2s infinite linear;
+            box-shadow: 0 0 15px #fff;
+            transition: width 1s ease;
+        }
+
+        @keyframes moveGradient {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        /* --- CONTROLS --- */
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 40px;
+        }
+
+        button {
+            background: transparent;
+            border: 1px solid var(--glass-border);
+            color: white;
+            padding: 14px 28px;
+            border-radius: 16px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        button:hover {
+            background: white;
+            color: black;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(255,255,255,0.1);
+        }
+
+        button:active { transform: scale(0.95); }
+
+        .btn-audio {
+            position: fixed;
+            bottom: 40px;
+            right: 40px;
+            width: 54px;
+            height: 54px;
+            border-radius: 20px;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(10px);
+        }
+
+        .motivation-text {
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            margin-top: 25px;
+            height: 20px;
+            font-weight: 400;
+        }
+
+        /* --- SESSION TRANSITION --- */
+        .flash {
+            animation: flashAnim 1s ease;
+        }
+        @keyframes flashAnim {
+            0% { opacity: 0; transform: scale(0.95); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg-image"></div>
+    <div class="vignette"></div>
+    <canvas id="stars-canvas"></canvas>
+
+    <div class="glass-card" id="main-card">
+        <div id="status" class="status-badge">READY TO WORK</div>
+        <div id="timer" class="timer-display">25:00</div>
+        
+        <div id="session-count" class="session-info">Session 1 of 4</div>
+
+        <div class="progress-wrapper">
+            <div id="progress" class="progress-bar"></div>
+        </div>
+
+        <div class="controls">
+            <button id="startBtn">Focus</button>
+            <button id="pauseBtn">Pause</button>
+            <button id="resetBtn">Reset</button>
+        </div>
+
+        <div id="motivation" class="motivation-text">Ready to make progress?</div>
+    </div>
+
+    <button id="audioToggle" class="btn-audio" title="Rain Ambience">🌧️</button>
+
+    <audio id="rainAudio" loop preload="auto">
+        <source src="rain.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        const TIMES = { FOCUS: 25 * 60, SHORT: 5 * 60, LONG: 15 * 60 };
+        const MOTIVATIONS = ["Stay sharp.", "Deep work mode.", "Flow state active.", "Enjoy your rest.", "Refresh and return."];
+        
+        let timeLeft = TIMES.FOCUS;
+        let timerId = null;
+        let session = 1;
+        let mode = 'FOCUS';
+        let isRainOn = false;
+
+        // --- ELEMENTS ---
+        const timerEl = document.getElementById('timer');
+        const statusEl = document.getElementById('status');
+        const sessionEl = document.getElementById('session-count');
+        const progressEl = document.getElementById('progress');
+        const rainAudio = document.getElementById('rainAudio');
+        const motivEl = document.getElementById('motivation');
+        const cardEl = document.getElementById('main-card');
+
+        function updateUI() {
+            const m = Math.floor(timeLeft / 60);
+            const s = timeLeft % 60;
+            timerEl.textContent = `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+            
+            sessionEl.textContent = `Sesi ${session} / 4`;
+            statusEl.textContent = mode.replace('_', ' ');
+
+            let total = mode === 'FOCUS' ? TIMES.FOCUS : (mode === 'SHORT' ? TIMES.SHORT : TIMES.LONG);
+            let perc = ((total - timeLeft) / total) * 100;
+            progressEl.style.width = `${perc}%`;
+
+            // Sync LocalStorage
+            localStorage.setItem('zen_time', timeLeft);
+            localStorage.setItem('zen_session', session);
+            localStorage.setItem('zen_mode', mode);
+        }
+
+        function startTimer() {
+            if (timerId) return;
+            if (isRainOn) rainAudio.play();
+            timerId = setInterval(() => {
+                timeLeft--;
+                updateUI();
+                if (timeLeft <= 0) {
+                    clearInterval(timerId);
+                    timerId = null;
+                    nextPhase();
+                }
+            }, 1000);
+        }
+
+        function nextPhase() {
+            cardEl.classList.add('flash');
+            setTimeout(() => cardEl.classList.remove('flash'), 1000);
+
+            if (mode === 'FOCUS') {
+                if (session >= 4) {
+                    mode = 'LONG';
+                    timeLeft = TIMES.LONG;
+                    motivEl.textContent = MOTIVATIONS[3];
+                } else {
+                    mode = 'SHORT';
+                    timeLeft = TIMES.SHORT;
+                    motivEl.textContent = MOTIVATIONS[3];
+                }
+            } else {
+                if (mode === 'LONG') session = 1;
+                else session++;
+                mode = 'FOCUS';
+                timeLeft = TIMES.FOCUS;
+                motivEl.textContent = MOTIVATIONS[Math.floor(Math.random()*3)];
+            }
+            updateUI();
+            startTimer();
+        }
+
+        // --- STAR ANIMATION (OPTIMIZED) ---
+        function initStars() {
+            const canvas = document.getElementById('stars-canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            const stars = Array.from({length: 100}, () => ({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                size: Math.random() * 2,
+                speed: Math.random() * 0.5 + 0.1,
+                opacity: Math.random()
+            }));
+
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                stars.forEach(s => {
+                    ctx.fillStyle = `rgba(255, 255, 255, ${s.opacity})`;
+                    ctx.beginPath();
+                    ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+                    ctx.fill();
+                    s.y -= s.speed;
+                    if (s.y < 0) s.y = canvas.height;
+                });
+                requestAnimationFrame(animate);
+            }
+            animate();
+        }
+
+        // --- CONTROLS ---
+        document.getElementById('startBtn').addEventListener('click', startTimer);
+        document.getElementById('pauseBtn').addEventListener('click', () => {
+            clearInterval(timerId);
+            timerId = null;
+            rainAudio.pause();
+        });
+        document.getElementById('resetBtn').addEventListener('click', () => {
+            localStorage.clear();
+            location.reload();
+        });
+        document.getElementById('audioToggle').addEventListener('click', function() {
+            isRainOn = !isRainOn;
+            this.style.background = isRainOn ? 'white' : 'var(--glass)';
+            this.style.color = isRainOn ? 'black' : 'white';
+            isRainOn ? rainAudio.play() : rainAudio.pause();
+        });
+
+        // --- START ---
+        const savedTime = localStorage.getItem('zen_time');
+        if (savedTime) {
+            timeLeft = parseInt(savedTime);
+            session = parseInt(localStorage.getItem('zen_session'));
+            mode = localStorage.getItem('zen_mode');
+        }
+
+        window.addEventListener('resize', () => {
+            const canvas = document.getElementById('stars-canvas');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        updateUI();
+        initStars();
+    </script>
+</body>
+</html>
