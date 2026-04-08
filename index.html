@@ -3,270 +3,282 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Deep Focus | Mentor Monitoring Mifthaa</title>
+    <title>Deep Focus | Tuan Muda Edition</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;400;600;700&display=swap');
 
         :root {
+            /* --- MODE MALAM --- */
             --bg-dark: #050505;
             --glass: rgba(255, 255, 255, 0.03);
             --glass-border: rgba(255, 255, 255, 0.1);
             --accent: #ffffff;
             --text-dim: #a0a0a0;
-            --glow-color: rgba(255, 255, 255, 0.5);
+            --glow-color: rgba(255, 255, 255, 0.3);
+            --bg-gradient: radial-gradient(circle, transparent 10%, rgba(0,0,0,0.95) 100%);
+            --card-shadow: rgba(0, 0, 0, 0.8);
+            --star-color: #ffffff;
+        }
+
+        body.pagi-mode {
+            /* --- MODE PAGI --- */
+            --bg-dark: #f8fafc;
+            --glass: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(15, 23, 42, 0.1);
+            --accent: #0f172a;
+            --text-dim: #64748b;
+            --glow-color: rgba(15, 23, 42, 0.05);
+            --bg-gradient: radial-gradient(circle, transparent 20%, rgba(248, 250, 252, 0.8) 100%);
+            --card-shadow: rgba(15, 23, 42, 0.1);
+            --star-color: #0f172a;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
-        body { background-color: var(--bg-dark); color: white; height: 100vh; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+        body { background-color: var(--bg-dark); color: var(--accent); height: 100vh; overflow: hidden; display: flex; align-items: center; justify-content: center; transition: all 0.8s ease; }
 
-        /* --- BACKGROUND & VISUAL --- */
-        .bg-image { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: url('latar.jpg') no-repeat center center/cover; z-index: -3; transform: scale(1.1); filter: brightness(0.25) grayscale(0.8); }
-        .vignette { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle, transparent 10%, rgba(0,0,0,0.95) 100%); z-index: -2; }
+        /* --- BACKGROUND PHOTO HANDLER --- */
+        .bg-layer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -3; transition: opacity 1s ease; background-position: center; background-size: cover; background-repeat: no-repeat; transform: scale(1.05); }
+        #bg-malam { background-image: url('malam.jpg'); opacity: 1; filter: brightness(0.3); }
+        #bg-pagi { background-image: url('pagi.jpg'); opacity: 0; filter: brightness(0.9); }
+        
+        body.pagi-mode #bg-malam { opacity: 0; }
+        body.pagi-mode #bg-pagi { opacity: 1; }
+
+        .vignette { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-gradient); z-index: -2; transition: background 0.8s; }
         #stars-canvas { position: fixed; top: 0; left: 0; z-index: -1; pointer-events: none; }
 
-        /* --- MAIN POMODORO CARD --- */
+        /* --- TOP RIGHT --- */
+        .top-right-panel { position: fixed; top: 30px; right: 30px; display: flex; flex-direction: column; align-items: flex-end; gap: 15px; z-index: 100; }
+        .digital-clock { text-align: right; }
+        #wita-time { font-size: 1.8rem; font-weight: 200; letter-spacing: 2px; }
+        #wita-date { font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; opacity: 0.6; }
+
+        .theme-switcher { display: flex; gap: 8px; }
+        .theme-btn { background: var(--glass); border: 1px solid var(--glass-border); color: var(--accent); padding: 6px 15px; border-radius: 100px; font-size: 0.65rem; cursor: pointer; transition: 0.3s; font-weight: 700; text-transform: uppercase; backdrop-filter: blur(10px); }
+        .theme-btn.active { background: var(--accent); color: var(--bg-dark); }
+
+        /* --- MAIN CARD --- */
         .glass-card {
-            background: var(--glass); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
-            border: 1px solid var(--glass-border); padding: 50px 40px; border-radius: 40px;
+            background: var(--glass); backdrop-filter: blur(30px); border: 1px solid var(--glass-border); padding: 50px 40px; border-radius: 40px;
             width: 90%; max-width: 500px; text-align: center; position: relative; z-index: 10;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+            box-shadow: 0 25px 50px -12px var(--card-shadow); transition: all 0.8s ease;
         }
-        .welcome-msg { font-size: 0.85rem; color: var(--accent); margin-bottom: 25px; opacity: 0.9; letter-spacing: 0.5px; }
-        .status-badge { display: inline-block; padding: 6px 16px; background: rgba(255, 255, 255, 0.05); border-radius: 100px; font-size: 0.65rem; font-weight: 700; letter-spacing: 2.5px; color: var(--text-dim); margin-bottom: 15px; border: 1px solid var(--glass-border); text-transform: uppercase; }
+
+        .welcome-msg { font-size: 0.8rem; margin-bottom: 25px; opacity: 0.9; line-height: 1.6; }
+        .status-badge { display: inline-block; padding: 6px 16px; background: rgba(128, 128, 128, 0.05); border-radius: 100px; font-size: 0.65rem; font-weight: 700; letter-spacing: 2px; color: var(--text-dim); margin-bottom: 10px; border: 1px solid var(--glass-border); text-transform: uppercase; }
+        .session-info { color: var(--text-dim); font-size: 0.75rem; margin-bottom: 20px; }
+
         .timer-display { font-size: 8rem; font-weight: 200; margin: 5px 0; letter-spacing: -5px; line-height: 1; text-shadow: 0 0 40px var(--glow-color); }
-        .session-info { color: var(--text-dim); font-size: 0.85rem; margin-top: 5px; font-weight: 400; }
+        .progress-wrapper { margin: 30px auto; width: 100%; height: 2px; background: rgba(128,128,128,0.1); overflow: hidden; }
+        .progress-bar { height: 100%; width: 100%; background: var(--accent); transition: width 1s linear; }
 
-        .progress-wrapper { margin: 40px auto; width: 100%; height: 2px; background: rgba(255,255,255,0.05); border-radius: 2px; overflow: hidden; }
-        .progress-bar { height: 100%; width: 0%; background: #fff; box-shadow: 0 0 15px #fff; transition: width 1s linear; }
+        .mode-selector { display: flex; justify-content: center; gap: 8px; margin-bottom: 25px; }
+        .mode-btn { background: var(--glass); border: 1px solid var(--glass-border); color: var(--text-dim); padding: 6px 12px; border-radius: 100px; font-size: 0.6rem; cursor: pointer; text-transform: uppercase; }
+        .mode-btn.active { background: var(--accent); color: var(--bg-dark); }
 
-        .controls { display: flex; justify-content: center; gap: 15px; margin-top: 35px; }
-        button { background: transparent; border: 1px solid var(--glass-border); color: white; padding: 14px 28px; border-radius: 15px; cursor: pointer; font-weight: 600; font-size: 0.85rem; transition: 0.3s; text-transform: uppercase; letter-spacing: 1px; }
-        button:hover { background: white; color: black; transform: translateY(-3px); box-shadow: 0 10px 20px rgba(255,255,255,0.1); }
-        button:active { transform: scale(0.95); }
+        .controls { display: flex; justify-content: center; gap: 12px; }
+        button.action { background: transparent; border: 1px solid var(--glass-border); color: var(--accent); padding: 12px 20px; border-radius: 12px; cursor: pointer; font-size: 0.75rem; text-transform: uppercase; min-width: 100px; transition: 0.3s; }
+        button.action:hover { background: var(--accent); color: var(--bg-dark); }
+        #startBtn { background: var(--accent); color: var(--bg-dark); }
 
-        /* --- MENTOR LIVE CHAT --- */
-        #chat-container { position: fixed; bottom: 30px; left: 30px; width: 320px; height: 400px; display: flex; flex-direction: column; z-index: 100; transition: 0.5s; }
-        .chat-header {
-            background: rgba(255, 255, 255, 0.08); padding: 14px 18px;
-            border-radius: 20px 20px 0 0; border: 1px solid var(--glass-border);
-            font-size: 0.7rem; font-weight: 700; letter-spacing: 1.5px; display: flex; align-items: center; justify-content: space-between;
-        }
-        .online-status { display: flex; align-items: center; gap: 10px; }
-        .online-dot { width: 8px; height: 8px; background: #fff; border-radius: 50%; box-shadow: 0 0 10px #fff; animation: pulse 2s infinite; }
-        @keyframes pulse { 0% { opacity: 0.4; } 50% { opacity: 1; } 100% { opacity: 0.4; } }
-        
-        #chat-messages {
-            flex: 1; background: var(--glass); backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border); border-top: none;
-            border-radius: 0 0 20px 20px; padding: 20px;
-            overflow-y: auto; display: flex; flex-direction: column; gap: 15px;
-            scroll-behavior: smooth;
-        }
-        #chat-messages::-webkit-scrollbar { width: 3px; }
-        #chat-messages::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); }
+        /* --- CHAT --- */
+        #chat-container { position: fixed; bottom: 30px; left: 30px; width: 280px; height: 350px; display: flex; flex-direction: column; z-index: 100; }
+        .chat-header { background: var(--glass); padding: 12px 15px; border-radius: 15px 15px 0 0; border: 1px solid var(--glass-border); font-size: 0.65rem; font-weight: 700; }
+        #chat-messages { flex: 1; background: var(--glass); border: 1px solid var(--glass-border); border-top: none; border-radius: 0 0 15px 15px; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+        .message { padding: 10px; border-radius: 10px; font-size: 0.7rem; background: rgba(128,128,128,0.05); border-left: 2px solid var(--accent); color: var(--accent); }
 
-        .message {
-            max-width: 95%; padding: 12px 14px; border-radius: 15px;
-            font-size: 0.8rem; line-height: 1.5; animation: slideUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-            background: rgba(255,255,255,0.05); border-left: 3px solid #fff; position: relative;
-        }
-        .msg-sender { font-weight: 700; font-size: 0.6rem; display: block; margin-bottom: 5px; opacity: 0.5; text-transform: uppercase; }
-        .msg-time { position: absolute; right: 12px; top: 12px; font-size: 0.6rem; opacity: 0.3; }
-
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* --- FLOATING CONTROLS --- */
-        .btn-audio { position: fixed; bottom: 30px; right: 30px; width: 55px; height: 55px; border-radius: 18px; display: flex; align-items: center; justify-content: center; background: var(--glass); border: 1px solid var(--glass-border); backdrop-filter: blur(10px); z-index: 100; cursor: pointer; color: white; font-size: 1.2rem; transition: 0.3s; }
-        .btn-audio:hover { background: white; color: black; }
-
-        .motivation-text { font-size: 0.85rem; color: var(--text-dim); margin-top: 30px; font-style: italic; }
+        .btn-audio { position: fixed; bottom: 30px; right: 30px; width: 45px; height: 45px; border-radius: 12px; background: var(--glass); border: 1px solid var(--glass-border); color: var(--accent); cursor: pointer; z-index: 100; }
     </style>
 </head>
 <body>
 
-    <div class="bg-image"></div>
+    <div id="bg-malam" class="bg-layer"></div>
+    <div id="bg-pagi" class="bg-layer"></div>
     <div class="vignette"></div>
     <canvas id="stars-canvas"></canvas>
 
-    <div id="chat-container">
-        <div class="chat-header">
-            <div class="online-status">
-                <div class="online-dot"></div>
-                PEMANTAUAN MENTOR
-            </div>
-            <span style="opacity: 0.5; font-size: 0.6rem;">AKTIF</span>
+    <div class="top-right-panel">
+        <div class="digital-clock">
+            <div id="wita-time">00:00:00</div>
+            <div id="wita-date">Memuat...</div>
         </div>
+        <div class="theme-switcher">
+            <button id="malamBtn" class="theme-btn active" onclick="setTheme('malam')">Malam 🌙</button>
+            <button id="pagiBtn" class="theme-btn" onclick="setTheme('pagi')">Pagi ☀️</button>
+        </div>
+    </div>
+
+    <div id="chat-container">
+        <div class="chat-header">MENTOR MONITORING</div>
         <div id="chat-messages"></div>
     </div>
 
     <div class="glass-card">
-        <div class="welcome-msg">🌙 Welcome back, Mifthaa. The night is yours to focus and study ✨</div>
-        <div id="status" class="status-badge">STANDBY</div>
-        <div id="timer" class="timer-display">25:00</div>
+        <div class="welcome-msg" id="welcome-txt">🌙 Selamat datang, Tuan Muda. <br>Waktu ini milikmu untuk fokus dan belajar ✨</div>
+        <div id="status" class="status-badge">Belajar</div>
         <div id="session-count" class="session-info">Sesi 1 / 4</div>
-        <div class="progress-wrapper"><div id="progress" class="progress-bar"></div></div>
-        <div class="controls">
-            <button id="startBtn">Focus</button>
-            <button id="pauseBtn">Pause</button>
-            <button id="resetBtn">Reset</button>
+
+        <div class="mode-selector">
+            <button class="mode-btn active" onclick="setMode('normal')">Normal</button>
+            <button class="mode-btn" onclick="setMode('fokus')">Fokus</button>
+            <button class="mode-btn" onclick="setMode('tekanan')">Tekanan</button>
+            <button class="mode-btn" onclick="setMode('silent')">Revenge</button>
         </div>
-        <div id="motivation" class="motivation-text">"Satu langkah lebih dekat ke IPDN."</div>
+
+        <div id="timer" class="timer-display">25:00</div>
+        <div class="progress-wrapper"><div id="progress-bar" class="progress-bar"></div></div>
+
+        <div class="controls">
+            <button id="startBtn" class="action" onclick="toggleTimer()">Start</button>
+            <button id="pauseBtn" class="action" onclick="pauseTimer()">Pause</button>
+            <button id="resetBtn" class="action" onclick="resetTimer()">Reset</button>
+        </div>
     </div>
 
-    <button id="audioToggle" class="btn-audio">🌧️</button>
+    <button id="audioToggle" class="btn-audio" onclick="toggleRain()">🌧️</button>
     
     <audio id="rainAudio" loop><source src="rain.mp3" type="audio/mpeg"></audio>
-    <audio id="notifAudio" preload="auto"><source src="notif.mp3" type="audio/mpeg"></audio>
+    <audio id="notifAudio"><source src="notif.mp3" type="audio/mpeg"></audio>
+    <audio id="alarmAudio"><source src="alarm.mp3" type="audio/mpeg"></audio>
 
     <script>
-        const TIMES = { FOCUS: 25 * 60, SHORT: 5 * 60, LONG: 15 * 60 };
-        const MENTOR_QUOTES = [
-            "Mifthaa, fokus. Ini waktumu.", "Jangan buang waktu, kamu punya tujuan besar.", "IPDN tidak untuk yang setengah-setengah.",
-            "Kalau kamu serius, buktikan sekarang.", "Fokus 25 menit, itu saja dulu.", "Kamu mau PIP? Mulai dari disiplin hari ini.",
-            "Jangan kalah sama rasa malas.", "Orang lain lagi belajar, kamu juga harus.", "Mifthaa, ingat tujuanmu masuk IPDN.",
-            "Satu sesi lagi, jangan berhenti sekarang.", "Kamu capek? Istirahat nanti, sekarang fokus.", "Disiplin lebih penting dari mood.",
-            "Kamu lagi kejar masa depan, bukan sekadar nilai.", "Jangan santai kalau mimpimu besar.", "PIP butuh orang kuat, bukan yang gampang menyerah.",
-            "Buktikan kalau kamu beda.", "Jangan tunggu semangat, mulai saja dulu.", "Kamu punya alasan, jangan dilupakan.",
-            "Fokus sekarang, bangga nanti.", "Jangan berhenti di tengah jalan.", "Kalau kamu berhenti, orang lain lanjut.",
-            "Mifthaa, kamu bisa lebih dari ini.", "Ingat siapa yang ingin kamu kejar.", "Jangan kalah sebelum mencoba maksimal.",
-            "Ini bukan tentang bisa atau tidak, tapi mau atau tidak.", "Kamu sudah mulai, sekarang selesaikan.", "Jangan sia-siakan waktumu malam ini.",
-            "Satu langkah kecil tetap kemajuan.", "Jadilah versi terbaik dirimu hari ini.", "Mifthaa, masa depanmu ditentukan sekarang."
-        ];
+        // --- REAL TIME CLOCK ---
+        function updateClock() {
+            const now = new Date();
+            const options = { timeZone: 'Asia/Makassar', hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' };
+            const dateOptions = { timeZone: 'Asia/Makassar', weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' };
+            document.getElementById('wita-time').textContent = now.toLocaleTimeString('id-ID', options);
+            document.getElementById('wita-date').textContent = now.toLocaleDateString('id-ID', dateOptions);
+        }
+        setInterval(updateClock, 1000); updateClock();
 
-        let timeLeft = TIMES.FOCUS;
+        // --- THEME & BACKGROUND ---
+        function setTheme(theme) {
+            const body = document.body;
+            const welcomeTxt = document.getElementById('welcome-txt');
+            if (theme === 'pagi') {
+                body.classList.add('pagi-mode');
+                document.getElementById('pagiBtn').classList.add('active');
+                document.getElementById('malamBtn').classList.remove('active');
+                welcomeTxt.innerHTML = "☀️ Selamat pagi, Tuan Muda. <br>Fajar baru, semangat baru untuk belajar ✨";
+            } else {
+                body.classList.remove('pagi-mode');
+                document.getElementById('malamBtn').classList.add('active');
+                document.getElementById('pagiBtn').classList.remove('active');
+                welcomeTxt.innerHTML = "🌙 Selamat datang, Tuan Muda. <br>Waktu ini milikmu untuk fokus dan belajar ✨";
+            }
+        }
+
+        // --- TIMER LOGIC ---
+        let timeLeft = 25 * 60;
+        let initialTime = 25 * 60;
         let timerId = null;
-        let mentorInterval = null;
+        let mentorId = null;
         let session = 1;
-        let mode = 'FOCUS';
-        let isRainOn = false;
+        let isBreak = false;
+        let currentMode = 'normal';
 
         const timerEl = document.getElementById('timer');
-        const statusEl = document.getElementById('status');
-        const sessionEl = document.getElementById('session-count');
-        const progressEl = document.getElementById('progress');
-        const rainAudio = document.getElementById('rainAudio');
-        const notifAudio = document.getElementById('notifAudio');
-        const chatMessages = document.getElementById('chat-messages');
+        const progressEl = document.getElementById('progress-bar');
+        const alarmAudio = document.getElementById('alarmAudio');
 
-        // --- CORE FUNCTIONS ---
-        function addChatMessage(text) {
-            const now = new Date();
-            const timeStr = now.getHours().toString().padStart(2,'0') + ":" + now.getMinutes().toString().padStart(2,'0');
-            const msgDiv = document.createElement('div');
-            msgDiv.className = 'message';
-            msgDiv.innerHTML = `<span class="msg-sender">Mentor</span><span class="msg-time">${timeStr}</span>${text}`;
-            
-            chatMessages.appendChild(msgDiv);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-
-            // Notif Sound
-            if (notifAudio) {
-                notifAudio.currentTime = 0;
-                notifAudio.play().catch(() => {});
-            }
-
-            if (chatMessages.childElementCount > 12) chatMessages.removeChild(chatMessages.firstChild);
-        }
-
-        function startMentorMonitoring() {
-            if (mentorInterval) clearInterval(mentorInterval);
-            mentorInterval = setInterval(() => {
-                if (timerId && mode === 'FOCUS') {
-                    const randomMsg = MENTOR_QUOTES[Math.floor(Math.random() * MENTOR_QUOTES.length)];
-                    addChatMessage(randomMsg);
-                }
-            }, 30000); // 30 detik monitoring
-        }
-
-        function stopMentorMonitoring() {
-            clearInterval(mentorInterval);
-            mentorInterval = null;
-        }
-
-        function updateUI() {
+        function updateDisplay() {
             const m = Math.floor(timeLeft / 60);
             const s = timeLeft % 60;
             timerEl.textContent = `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
-            sessionEl.textContent = `Sesi ${session} / 4`;
-            statusEl.textContent = mode === 'FOCUS' ? "Fokus" : "Istirahat";
-            let total = mode === 'FOCUS' ? TIMES.FOCUS : (mode === 'SHORT' ? TIMES.SHORT : TIMES.LONG);
-            progressEl.style.width = `${((total - timeLeft) / total) * 100}%`;
+            progressEl.style.width = `${(timeLeft / initialTime) * 100}%`;
+            document.getElementById('status').textContent = isBreak ? "Istirahat" : "Belajar";
+            document.getElementById('session-count').textContent = `Sesi ${session} / 4`;
         }
 
-        function startTimer() {
+        function toggleTimer() {
             if (timerId) return;
-            if (isRainOn) rainAudio.play().catch(() => {});
-            
-            addChatMessage("Monitoring dimulai. Mifthaa, tetap di jalurmu.");
-            startMentorMonitoring();
+            startEngine();
+            document.getElementById('startBtn').textContent = "Running";
+        }
 
+        function pauseTimer() {
+            clearInterval(timerId); timerId = null;
+            clearInterval(mentorId);
+            document.getElementById('startBtn').textContent = "Start";
+        }
+
+        function resetTimer() {
+            pauseTimer();
+            isBreak = false; timeLeft = 25 * 60; initialTime = 25 * 60;
+            updateDisplay();
+        }
+
+        function startEngine() {
+            if (timerId) clearInterval(timerId);
+            startChat();
             timerId = setInterval(() => {
-                timeLeft--;
-                updateUI();
-                if (timeLeft <= 0) {
-                    clearInterval(timerId);
-                    timerId = null;
-                    nextPhase();
+                if (timeLeft > 0) {
+                    timeLeft--; updateDisplay();
+                } else {
+                    alarmAudio.play();
+                    handleNext();
                 }
             }, 1000);
         }
 
-        function nextPhase() {
-            if (mode === 'FOCUS') {
-                if (session >= 4) { mode = 'LONG'; timeLeft = TIMES.LONG; addChatMessage("Misi selesai. Ambil istirahat panjang."); }
-                else { mode = 'SHORT'; timeLeft = TIMES.SHORT; addChatMessage("Sesi berakhir. 5 menit jeda, jangan lengah."); }
+        function handleNext() {
+            pauseTimer();
+            if (!isBreak) {
+                if (session < 4) {
+                    session++; alert("Sesi belajar selesai. Waktunya istirahat (5 Menit).");
+                    isBreak = true; timeLeft = 5 * 60; initialTime = 5 * 60;
+                } else {
+                    session = 1; alert("Semua sesi selesai!"); resetTimer(); return;
+                }
             } else {
-                if (mode === 'LONG') session = 1; else session++;
-                mode = 'FOCUS'; timeLeft = TIMES.FOCUS;
-                addChatMessage("Waktu istirahat habis. Mifthaa, kembali bekerja.");
+                isBreak = false; timeLeft = 25 * 60; initialTime = 25 * 60;
+                alert("Istirahat selesai. Kembali belajar.");
             }
-            updateUI();
-            startTimer();
+            updateDisplay(); startEngine();
         }
 
-        // --- BUTTONS ---
-        document.getElementById('startBtn').addEventListener('click', startTimer);
-        document.getElementById('pauseBtn').addEventListener('click', () => {
-            clearInterval(timerId);
-            timerId = null;
-            stopMentorMonitoring();
-            rainAudio.pause();
-            addChatMessage("Baru sebentar sudah berhenti? Sainganmu tidak pernah berhenti.");
-        });
-        document.getElementById('resetBtn').addEventListener('click', () => { location.reload(); });
-        document.getElementById('audioToggle').addEventListener('click', function() {
-            isRainOn = !isRainOn;
-            this.style.background = isRainOn ? 'white' : 'var(--glass)';
-            this.style.color = isRainOn ? 'black' : 'white';
-            isRainOn ? rainAudio.play() : rainAudio.pause();
-        });
+        // --- MENTOR CHAT ---
+        function startChat() {
+            if (currentMode === 'normal' || currentMode === 'silent' || isBreak) return;
+            mentorId = setInterval(() => {
+                const msg = document.createElement('div');
+                msg.className = 'message';
+                msg.textContent = currentMode === 'fokus' ? "Terus fokus, Tuan Muda." : "Waktu terus berjalan, jangan malas!";
+                document.getElementById('chat-messages').appendChild(msg);
+                document.getElementById('chat-messages').scrollTop = 9999;
+                if (document.getElementById('chat-messages').childElementCount > 5) document.getElementById('chat-messages').removeChild(document.getElementById('chat-messages').firstChild);
+            }, 15000);
+        }
 
-        // --- CANVAS ANIMATION ---
+        function setMode(m) {
+            currentMode = m;
+            document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.toggle('active', btn.textContent.toLowerCase() === m));
+            clearInterval(mentorId); if (timerId) startChat();
+        }
+
+        function toggleRain() {
+            const rain = document.getElementById('rainAudio');
+            const btn = document.getElementById('audioToggle');
+            if (rain.paused) { rain.play(); btn.style.background = "var(--accent)"; btn.style.color = "var(--bg-dark)"; }
+            else { rain.pause(); btn.style.background = "var(--glass)"; btn.style.color = "var(--accent)"; }
+        }
+
+        // --- STARS ANIMATION ---
         const canvas = document.getElementById('stars-canvas');
         const ctx = canvas.getContext('2d');
         let stars = [];
         function initStars() {
             canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-            stars = Array.from({length: 120}, () => ({
-                x: Math.random() * canvas.width, y: Math.random() * canvas.height,
-                size: Math.random() * 1.8, speed: Math.random() * 0.4 + 0.1, opacity: Math.random()
-            }));
+            stars = Array.from({length: 80}, () => ({ x: Math.random() * canvas.width, y: Math.random() * canvas.height, size: Math.random() * 1.5, speed: Math.random() * 0.2 }));
         }
         function animate() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            stars.forEach(s => {
-                ctx.fillStyle = `rgba(255, 255, 255, ${s.opacity})`;
-                ctx.beginPath(); ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2); ctx.fill();
-                s.y -= s.speed; if (s.y < 0) s.y = canvas.height;
-            });
+            ctx.clearRect(0,0,canvas.width, canvas.height);
+            ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--star-color');
+            stars.forEach(s => { ctx.beginPath(); ctx.arc(s.x, s.y, s.size, 0, Math.PI*2); ctx.fill(); s.y -= s.speed; if(s.y<0) s.y = canvas.height; });
             requestAnimationFrame(animate);
         }
-        window.addEventListener('resize', initStars);
-        initStars(); animate();
-        updateUI();
-        
-        // Pesan pertama
-        setTimeout(() => addChatMessage("Selamat malam, Mifthaa. Mari kita kejar mimpi IPDN malam ini."), 1500);
+        window.addEventListener('resize', initStars); initStars(); animate(); updateDisplay();
     </script>
 </body>
 </html>
