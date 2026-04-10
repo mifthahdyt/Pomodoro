@@ -34,60 +34,334 @@
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
-        body { background-color: var(--bg-dark); color: var(--accent); height: 100vh; overflow: hidden; display: flex; align-items: center; justify-content: center; transition: all 0.8s ease; }
+        body { 
+            background-color: var(--bg-dark); 
+            color: var(--accent); 
+            height: 100vh; 
+            overflow: hidden; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            transition: all 0.8s ease; 
+        }
 
         /* --- BACKGROUND PHOTO HANDLER --- */
-        .bg-layer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -3; transition: opacity 1s ease; background-position: center; background-size: cover; background-repeat: no-repeat; transform: scale(1.05); }
-        #bg-malam { background-image: url('malam.png'); opacity: 1; filter: brightness(0.3); }
-        #bg-pagi { background-image: url('pagi.png'); opacity: 0; filter: brightness(0.3); }
+        .bg-layer { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            z-index: -3; 
+            transition: opacity 1s ease; 
+            background-position: center; 
+            background-size: cover; 
+            background-repeat: no-repeat; 
+            transform: scale(1.05); 
+        }
+        #bg-malam { background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080"><rect fill="%23001a4d" width="1920" height="1080"/></svg>'); opacity: 1; filter: brightness(0.3); }
+        #bg-pagi { background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080"><rect fill="%23e8f4f8" width="1920" height="1080"/></svg>'); opacity: 0; filter: brightness(0.3); }
         
         body.pagi-mode #bg-malam { opacity: 0; }
-        body.pagi-mode #bg-pagi { opacity: 0; }
+        body.pagi-mode #bg-pagi { opacity: 1; }
 
         .vignette { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-gradient); z-index: -2; transition: background 0.8s; }
         #stars-canvas { position: fixed; top: 0; left: 0; z-index: -1; pointer-events: none; }
 
-        /* --- TOP RIGHT --- */
-        .top-right-panel { position: fixed; top: 30px; right: 30px; display: flex; flex-direction: column; align-items: flex-end; gap: 15px; z-index: 100; }
-        .digital-clock { text-align: right; }
-        #wita-time { font-size: 1.8rem; font-weight: 200; letter-spacing: 2px; }
-        #wita-date { font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; opacity: 0.6; }
+        /* --- STATS PANEL (NEW) --- */
+        .stats-panel {
+            position: fixed;
+            top: 30px;
+            left: 30px;
+            background: var(--glass);
+            backdrop-filter: blur(30px);
+            border: 1px solid var(--glass-border);
+            padding: 12px 16px;
+            border-radius: 15px;
+            font-size: 0.7rem;
+            z-index: 100;
+        }
 
-        .theme-switcher { display: flex; gap: 8px; }
+        .stat-item {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .stat-label {
+            opacity: 0.7;
+        }
+
+        .stat-value {
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        /* --- TOP RIGHT --- */
+        .top-right-panel { 
+            position: fixed; 
+            top: 30px; 
+            right: 30px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: flex-end; 
+            gap: 15px; 
+            z-index: 100; 
+        }
+        .digital-clock { text-align: right; }
+        #wita-time { font-size: clamp(1.2rem, 3vw, 1.8rem); font-weight: 200; letter-spacing: 2px; }
+        #wita-date { font-size: clamp(0.55rem, 2vw, 0.65rem); font-weight: 600; text-transform: uppercase; letter-spacing: 2px; opacity: 0.6; }
+
+        .theme-switcher { display: flex; gap: 8px; flex-wrap: wrap; }
         .theme-btn { background: var(--glass); border: 1px solid var(--glass-border); color: var(--accent); padding: 6px 15px; border-radius: 100px; font-size: 0.65rem; cursor: pointer; transition: 0.3s; font-weight: 700; text-transform: uppercase; backdrop-filter: blur(10px); }
+        .theme-btn:hover { opacity: 0.8; }
+        .theme-btn:focus { outline: 2px solid var(--accent); outline-offset: 2px; }
         .theme-btn.active { background: var(--accent); color: var(--bg-dark); }
 
         /* --- MAIN CARD --- */
         .glass-card {
-            background: var(--glass); backdrop-filter: blur(30px); border: 1px solid var(--glass-border); padding: 50px 40px; border-radius: 40px;
-            width: 90%; max-width: 500px; text-align: center; position: relative; z-index: 10;
-            box-shadow: 0 25px 50px -12px var(--card-shadow); transition: all 0.8s ease;
+            background: var(--glass); 
+            backdrop-filter: blur(30px); 
+            border: 1px solid var(--glass-border); 
+            padding: clamp(20px, 8vw, 50px) clamp(15px, 6vw, 40px); 
+            border-radius: 40px;
+            width: 90%; 
+            max-width: 500px; 
+            text-align: center; 
+            position: relative; 
+            z-index: 10;
+            box-shadow: 0 25px 50px -12px var(--card-shadow); 
+            transition: all 0.8s ease;
         }
 
         .welcome-msg { font-size: 0.8rem; margin-bottom: 25px; opacity: 0.9; line-height: 1.6; }
-        .status-badge { display: inline-block; padding: 6px 16px; background: rgba(128, 128, 128, 0.05); border-radius: 100px; font-size: 0.65rem; font-weight: 700; letter-spacing: 2px; color: var(--text-dim); margin-bottom: 10px; border: 1px solid var(--glass-border); text-transform: uppercase; }
+        .status-badge { 
+            display: inline-block; 
+            padding: 6px 16px; 
+            background: rgba(128, 128, 128, 0.05); 
+            border-radius: 100px; 
+            font-size: 0.65rem; 
+            font-weight: 700; 
+            letter-spacing: 2px; 
+            color: var(--text-dim); 
+            margin-bottom: 10px; 
+            border: 1px solid var(--glass-border); 
+            text-transform: uppercase; 
+        }
         .session-info { color: var(--text-dim); font-size: 0.75rem; margin-bottom: 20px; }
 
-        .timer-display { font-size: 8rem; font-weight: 200; margin: 5px 0; letter-spacing: -5px; line-height: 1; text-shadow: 0 0 40px var(--glow-color); }
+        .timer-display { 
+            font-size: clamp(3rem, 12vw, 8rem); 
+            font-weight: 200; 
+            margin: 5px 0; 
+            letter-spacing: -5px; 
+            line-height: 1; 
+            text-shadow: 0 0 40px var(--glow-color); 
+        }
         .progress-wrapper { margin: 30px auto; width: 100%; height: 2px; background: rgba(128,128,128,0.1); overflow: hidden; }
         .progress-bar { height: 100%; width: 100%; background: var(--accent); transition: width 1s linear; }
 
-        .mode-selector { display: flex; justify-content: center; gap: 8px; margin-bottom: 25px; }
-        .mode-btn { background: var(--glass); border: 1px solid var(--glass-border); color: var(--text-dim); padding: 6px 12px; border-radius: 100px; font-size: 0.6rem; cursor: pointer; text-transform: uppercase; }
+        .mode-selector { display: flex; justify-content: center; gap: 8px; margin-bottom: 25px; flex-wrap: wrap; }
+        .mode-btn { 
+            background: var(--glass); 
+            border: 1px solid var(--glass-border); 
+            color: var(--text-dim); 
+            padding: clamp(5px, 2vw, 6px) clamp(10px, 2vw, 12px); 
+            border-radius: 100px; 
+            font-size: clamp(0.55rem, 1.5vw, 0.6rem); 
+            cursor: pointer; 
+            text-transform: uppercase; 
+            transition: 0.3s;
+        }
+        .mode-btn:hover { opacity: 0.8; }
+        .mode-btn:focus { outline: 2px solid var(--accent); outline-offset: 2px; }
         .mode-btn.active { background: var(--accent); color: var(--bg-dark); }
 
-        .controls { display: flex; justify-content: center; gap: 12px; }
-        button.action { background: transparent; border: 1px solid var(--glass-border); color: var(--accent); padding: 12px 20px; border-radius: 12px; cursor: pointer; font-size: 0.75rem; text-transform: uppercase; min-width: 100px; transition: 0.3s; }
+        .controls { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
+        button.action { 
+            background: transparent; 
+            border: 1px solid var(--glass-border); 
+            color: var(--accent); 
+            padding: 12px 20px; 
+            border-radius: 12px; 
+            cursor: pointer; 
+            font-size: 0.75rem; 
+            text-transform: uppercase; 
+            min-width: 80px;
+            transition: 0.3s;
+        }
         button.action:hover { background: var(--accent); color: var(--bg-dark); }
+        button.action:focus { outline: 2px solid var(--accent); outline-offset: 2px; }
         #startBtn { background: var(--accent); color: var(--bg-dark); }
 
         /* --- CHAT --- */
-        #chat-container { position: fixed; bottom: 30px; left: 30px; width: 280px; height: 350px; display: flex; flex-direction: column; z-index: 100; }
-        .chat-header { background: var(--glass); padding: 12px 15px; border-radius: 15px 15px 0 0; border: 1px solid var(--glass-border); font-size: 0.65rem; font-weight: 700; }
-        #chat-messages { flex: 1; background: var(--glass); border: 1px solid var(--glass-border); border-top: none; border-radius: 0 0 15px 15px; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
-        .message { padding: 10px; border-radius: 10px; font-size: 0.7rem; background: rgba(128,128,128,0.05); border-left: 2px solid var(--accent); color: var(--accent); }
+        #chat-container { 
+            position: fixed; 
+            bottom: 30px; 
+            left: 30px; 
+            width: 280px; 
+            height: 350px; 
+            display: flex; 
+            flex-direction: column; 
+            z-index: 100; 
+        }
+        .chat-header { 
+            background: var(--glass); 
+            padding: 12px 15px; 
+            border-radius: 15px 15px 0 0; 
+            border: 1px solid var(--glass-border); 
+            font-size: 0.65rem; 
+            font-weight: 700; 
+        }
+        #chat-messages { 
+            flex: 1; 
+            background: var(--glass); 
+            border: 1px solid var(--glass-border); 
+            border-top: none; 
+            border-radius: 0 0 15px 15px; 
+            padding: 15px; 
+            overflow-y: auto; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 10px; 
+        }
+        .message { 
+            padding: 10px; 
+            border-radius: 10px; 
+            font-size: 0.7rem; 
+            background: rgba(128,128,128,0.05); 
+            border-left: 2px solid var(--accent); 
+            color: var(--accent); 
+            word-break: break-word;
+        }
 
-        .btn-audio { position: fixed; bottom: 30px; right: 30px; width: 45px; height: 45px; border-radius: 12px; background: var(--glass); border: 1px solid var(--glass-border); color: var(--accent); cursor: pointer; z-index: 100; }
+        .btn-audio { 
+            position: fixed; 
+            bottom: 30px; 
+            right: 30px; 
+            width: 45px; 
+            height: 45px; 
+            border-radius: 12px; 
+            background: var(--glass); 
+            border: 1px solid var(--glass-border); 
+            color: var(--accent); 
+            cursor: pointer; 
+            z-index: 100; 
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.3s;
+        }
+        .btn-audio:hover { opacity: 0.8; }
+        .btn-audio:focus { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+        /* --- TOAST NOTIFICATION (NEW) --- */
+        .toast-notification {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--accent);
+            color: var(--bg-dark);
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            z-index: 1000;
+            opacity: 0;
+            transition: all 0.3s ease;
+            max-width: 90%;
+            text-align: center;
+        }
+        .toast-notification.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        /* --- MOBILE RESPONSIVENESS --- */
+        @media (max-width: 768px) {
+            .stats-panel {
+                top: 15px;
+                left: 15px;
+                padding: 10px 12px;
+                font-size: 0.65rem;
+            }
+
+            .top-right-panel {
+                top: 15px;
+                right: 15px;
+                gap: 10px;
+            }
+            
+            #chat-container {
+                width: calc(100% - 30px);
+                max-width: 280px;
+                height: 250px;
+                bottom: 100px;
+                left: 15px;
+            }
+            
+            .controls {
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            button.action {
+                width: 100%;
+                min-width: unset;
+            }
+            
+            .btn-audio {
+                bottom: 15px;
+                right: 15px;
+                width: 40px;
+                height: 40px;
+            }
+
+            .glass-card {
+                border-radius: 30px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            #wita-time {
+                font-size: 1.1rem;
+                letter-spacing: 1px;
+            }
+            
+            #wita-date {
+                font-size: 0.5rem;
+            }
+
+            .theme-btn {
+                padding: 5px 10px;
+                font-size: 0.6rem;
+            }
+
+            .mode-btn {
+                padding: 4px 8px;
+                font-size: 0.5rem;
+            }
+
+            .welcome-msg {
+                font-size: 0.75rem;
+            }
+
+            .timer-display {
+                font-size: clamp(2.5rem, 10vw, 5rem);
+            }
+
+            #chat-container {
+                display: none; /* Sembunyikan chat di mobile untuk space */
+            }
+
+            .btn-audio {
+                width: 40px;
+                height: 40px;
+                font-size: 1rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -97,65 +371,162 @@
     <div class="vignette"></div>
     <canvas id="stars-canvas"></canvas>
 
+    <!-- STATS PANEL (NEW) -->
+    <div class="stats-panel">
+        <div class="stat-item">
+            <span class="stat-label">📊 Sesi:</span>
+            <span id="stat-count" class="stat-value">0</span>
+        </div>
+    </div>
+
     <div class="top-right-panel">
         <div class="digital-clock">
             <div id="wita-time">00:00:00</div>
             <div id="wita-date">Memuat...</div>
         </div>
         <div class="theme-switcher">
-            <button id="malamBtn" class="theme-btn active" onclick="setTheme('malam')">Malam 🌙</button>
-            <button id="pagiBtn" class="theme-btn" onclick="setTheme('pagi')">Pagi ☀️</button>
+            <button id="malamBtn" class="theme-btn active" aria-label="Mode malam">🌙 Malam</button>
+            <button id="pagiBtn" class="theme-btn" aria-label="Mode pagi">☀️ Pagi</button>
         </div>
     </div>
 
     <div id="chat-container">
-        <div class="chat-header">MENTOR MONITORING</div>
-        <div id="chat-messages"></div>
+        <div class="chat-header">💬 MENTOR MONITORING</div>
+        <div id="chat-messages" role="region" aria-live="polite" aria-label="Mentor messages"></div>
     </div>
 
     <div class="glass-card">
         <div class="welcome-msg" id="welcome-txt">🌙 Selamat datang, Tuan Muda. <br>Waktu ini milikmu untuk fokus dan belajar ✨</div>
-        <div id="status" class="status-badge">Belajar</div>
+        <div id="status" class="status-badge" role="status">Belajar</div>
         <div id="session-count" class="session-info">Sesi 1 / 4</div>
 
         <div class="mode-selector">
-            <button class="mode-btn active" onclick="setMode('normal')">Normal</button>
-            <button class="mode-btn" onclick="setMode('fokus')">Fokus</button>
-            <button class="mode-btn" onclick="setMode('tekanan')">Tekanan</button>
-            <button class="mode-btn" onclick="setMode('silent')">Revenge</button>
+            <button class="mode-btn active" data-mode="normal" aria-label="Mode normal">Normal</button>
+            <button class="mode-btn" data-mode="fokus" aria-label="Mode fokus">Fokus</button>
+            <button class="mode-btn" data-mode="tekanan" aria-label="Mode tekanan">Tekanan</button>
+            <button class="mode-btn" data-mode="silent" aria-label="Mode senyap (Revenge)">Revenge</button>
         </div>
 
-        <div id="timer" class="timer-display">25:00</div>
-        <div class="progress-wrapper"><div id="progress-bar" class="progress-bar"></div></div>
+        <div role="region" aria-live="polite" aria-label="Pomodoro Timer">
+            <div id="timer" class="timer-display" aria-label="Timer: 25 menit 0 detik">25:00</div>
+            <div class="progress-wrapper">
+                <div id="progress-bar" class="progress-bar" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+        </div>
 
         <div class="controls">
-            <button id="startBtn" class="action" onclick="toggleTimer()">Start</button>
-            <button id="pauseBtn" class="action" onclick="pauseTimer()">Pause</button>
-            <button id="resetBtn" class="action" onclick="resetTimer()">Reset</button>
+            <button id="startBtn" class="action" aria-label="Mulai timer (Tekan Space)">Start</button>
+            <button id="pauseBtn" class="action" aria-label="Jeda timer (Tekan P)">Pause</button>
+            <button id="resetBtn" class="action" aria-label="Reset timer (Tekan R)">Reset</button>
         </div>
     </div>
 
-    <button id="audioToggle" class="btn-audio" onclick="toggleRain()">🌧️</button>
+    <button id="audioToggle" class="btn-audio" aria-label="Nyalakan/matikan suara hujan">🌧️</button>
     
+    <!-- AUDIO FILES dengan ERROR HANDLING -->
     <audio id="rainAudio" loop><source src="rain.mp3" type="audio/mpeg"></audio>
     <audio id="notifAudio"><source src="notif.mp3" type="audio/mpeg"></audio>
     <audio id="alarmAudio"><source src="alarm.mp3" type="audio/mpeg"></audio>
 
     <script>
-        // --- REAL TIME CLOCK ---
+        // ========== CONSTANTS & VARIABLES ==========
+        const STORAGE_KEY = 'pomodoro_stats';
+        const WORK_TIME = 25 * 60;
+        const SHORT_BREAK = 5 * 60;
+        const LONG_BREAK = 15 * 60;
+
+        let timeLeft = WORK_TIME;
+        let initialTime = WORK_TIME;
+        let timerId = null;
+        let mentorId = null;
+        let session = 1;
+        let isBreak = false;
+        let currentMode = 'normal';
+        let sessionCounter = 0;
+
+        const timerEl = document.getElementById('timer');
+        const progressEl = document.getElementById('progress-bar');
+        const alarmAudio = document.getElementById('alarmAudio');
+        const rainAudio = document.getElementById('rainAudio');
+
+        // ========== TOAST NOTIFICATION (NEW) ==========
+        function showToast(message, duration = 3000) {
+            const toast = document.createElement('div');
+            toast.className = 'toast-notification';
+            toast.textContent = message;
+            toast.setAttribute('role', 'status');
+            document.body.appendChild(toast);
+            
+            setTimeout(() => toast.classList.add('show'), 10);
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, duration);
+        }
+
+        // ========== AUDIO ERROR HANDLING (NEW) ==========
+        function setupAudioFiles() {
+            const audioFiles = [
+                { id: 'rainAudio', src: 'rain.mp3' },
+                { id: 'notifAudio', src: 'notif.mp3' },
+                { id: 'alarmAudio', src: 'alarm.mp3' }
+            ];
+
+            audioFiles.forEach(file => {
+                const audio = document.getElementById(file.id);
+                if (audio) {
+                    audio.addEventListener('error', () => {
+                        console.warn(`⚠️ Audio file not found: ${file.src}`);
+                        if (file.id === 'rainAudio') {
+                            document.getElementById('audioToggle').style.opacity = '0.5';
+                            document.getElementById('audioToggle').disabled = true;
+                        }
+                    });
+                }
+            });
+        }
+
+        // Safe play function
+        function safePlayAudio(audioElement) {
+            if (!audioElement) return;
+            try {
+                audioElement.play().catch(e => console.warn('⚠️ Audio play failed:', e));
+            } catch (e) {
+                console.warn('⚠️ Audio error:', e);
+            }
+        }
+
+        // ========== REAL TIME CLOCK ==========
         function updateClock() {
             const now = new Date();
-            const options = { timeZone: 'Asia/Makassar', hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' };
-            const dateOptions = { timeZone: 'Asia/Makassar', weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' };
+            const options = { 
+                timeZone: 'Asia/Makassar', 
+                hour12: false, 
+                hour: '2-digit', 
+                minute: '2-digit', 
+                second: '2-digit' 
+            };
+            const dateOptions = { 
+                timeZone: 'Asia/Makassar', 
+                weekday: 'long', 
+                day: '2-digit', 
+                month: 'long', 
+                year: 'numeric' 
+            };
+            
             document.getElementById('wita-time').textContent = now.toLocaleTimeString('id-ID', options);
             document.getElementById('wita-date').textContent = now.toLocaleDateString('id-ID', dateOptions);
         }
-        setInterval(updateClock, 1000); updateClock();
+        
+        setInterval(updateClock, 1000);
+        updateClock();
 
-        // --- THEME & BACKGROUND ---
+        // ========== THEME SWITCHING ==========
         function setTheme(theme) {
             const body = document.body;
             const welcomeTxt = document.getElementById('welcome-txt');
+            
             if (theme === 'pagi') {
                 body.classList.add('pagi-mode');
                 document.getElementById('pagiBtn').classList.add('active');
@@ -167,30 +538,38 @@
                 document.getElementById('pagiBtn').classList.remove('active');
                 welcomeTxt.innerHTML = "🌙 Selamat datang, Tuan Muda. <br>Waktu ini milikmu untuk fokus dan belajar ✨";
             }
+            
+            // Save theme preference
+            saveStats();
         }
 
-        // --- TIMER LOGIC ---
-        let timeLeft = 25 * 60;
-        let initialTime = 25 * 60;
-        let timerId = null;
-        let mentorId = null;
-        let session = 1;
-        let isBreak = false;
-        let currentMode = 'normal';
+        // Theme button events
+        document.getElementById('malamBtn').addEventListener('click', () => setTheme('malam'));
+        document.getElementById('pagiBtn').addEventListener('click', () => setTheme('pagi'));
 
-        const timerEl = document.getElementById('timer');
-        const progressEl = document.getElementById('progress-bar');
-        const alarmAudio = document.getElementById('alarmAudio');
-
+        // ========== TIMER DISPLAY UPDATE ==========
         function updateDisplay() {
             const m = Math.floor(timeLeft / 60);
             const s = timeLeft % 60;
-            timerEl.textContent = `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
-            progressEl.style.width = `${(timeLeft / initialTime) * 100}%`;
+            const timeString = `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+            
+            timerEl.textContent = timeString;
+            timerEl.setAttribute('aria-label', `Timer: ${m} menit ${s} detik`);
+            
+            // Update progress bar
+            const progressPercent = (timeLeft / initialTime) * 100;
+            progressEl.style.width = `${progressPercent}%`;
+            document.querySelector('[role="progressbar"]').setAttribute('aria-valuenow', Math.round(progressPercent));
+            
+            // Update status
             document.getElementById('status').textContent = isBreak ? "Istirahat" : "Belajar";
             document.getElementById('session-count').textContent = `Sesi ${session} / 4`;
+            
+            // Update stats counter
+            document.getElementById('stat-count').textContent = sessionCounter;
         }
 
+        // ========== TIMER CONTROL FUNCTIONS ==========
         function toggleTimer() {
             if (timerId) return;
             startEngine();
@@ -198,87 +577,254 @@
         }
 
         function pauseTimer() {
-            clearInterval(timerId); timerId = null;
+            clearInterval(timerId);
+            timerId = null;
             clearInterval(mentorId);
-            document.getElementById('startBtn').textContent = "Start";
+            document.getElementById('startBtn').textContent = "Resume";
         }
 
         function resetTimer() {
             pauseTimer();
-            isBreak = false; timeLeft = 25 * 60; initialTime = 25 * 60;
+            isBreak = false;
+            timeLeft = WORK_TIME;
+            initialTime = WORK_TIME;
+            session = 1;
             updateDisplay();
+            document.getElementById('startBtn').textContent = "Start";
+            showToast("⏱️ Timer direset");
         }
 
         function startEngine() {
             if (timerId) clearInterval(timerId);
             startChat();
+            
             timerId = setInterval(() => {
                 if (timeLeft > 0) {
-                    timeLeft--; updateDisplay();
+                    timeLeft--;
+                    updateDisplay();
                 } else {
-                    alarmAudio.play();
+                    safePlayAudio(alarmAudio);
                     handleNext();
                 }
             }, 1000);
         }
 
+        // ========== HANDLE NEXT SESSION (IMPROVED) ==========
         function handleNext() {
             pauseTimer();
+            
             if (!isBreak) {
+                // Setelah belajar → istirahat
+                sessionCounter++;
+                
                 if (session < 4) {
-                    session++; alert("Sesi belajar selesai. Waktunya istirahat (5 Menit).");
-                    isBreak = true; timeLeft = 5 * 60; initialTime = 5 * 60;
+                    session++;
+                    showToast(`✅ Sesi belajar selesai! Istirahat 5 menit`);
+                    isBreak = true;
+                    timeLeft = SHORT_BREAK;
+                    initialTime = SHORT_BREAK;
                 } else {
-                    session = 1; alert("Semua sesi selesai!"); resetTimer(); return;
+                    // Setelah sesi 4 → long break
+                    showToast("🎉 4 sesi selesai! Long break 15 menit");
+                    isBreak = true;
+                    timeLeft = LONG_BREAK;
+                    initialTime = LONG_BREAK;
                 }
             } else {
-                isBreak = false; timeLeft = 25 * 60; initialTime = 25 * 60;
-                alert("Istirahat selesai. Kembali belajar.");
+                // Istirahat selesai
+                if (session === 4) {
+                    // Setelah long break → reset
+                    showToast("🚀 Long break selesai. Mulai sesi baru!");
+                    session = 1;
+                    isBreak = false;
+                    timeLeft = WORK_TIME;
+                    initialTime = WORK_TIME;
+                    updateDisplay();
+                    saveStats();
+                    return;
+                } else {
+                    // Regular break selesai → kembali belajar
+                    isBreak = false;
+                    showToast(`💪 Kembali belajar sesi ${session}`);
+                    timeLeft = WORK_TIME;
+                    initialTime = WORK_TIME;
+                }
             }
-            updateDisplay(); startEngine();
+            
+            updateDisplay();
+            saveStats();
+            startEngine();
         }
 
-        // --- MENTOR CHAT ---
+        // ========== MENTOR CHAT (IMPROVED) ==========
+        const mentorMessages = {
+            fokus: [
+                "Terus fokus, Tuan Muda. Jangan lihat HP.",
+                "Konsentrasi adalah kunci kesuksesan.",
+                "Setiap menit berharga untuk belajarmu.",
+                "Semangat! Jangan kehabisan motivasi."
+            ],
+            tekanan: [
+                "Waktu terus berjalan, jangan malas!",
+                "Produktivitas dimulai dari sekarang.",
+                "Percepat pace belajarmu!",
+                "Deadline sudah dekat, fokus sekarang!"
+            ],
+            normal: []
+        };
+
         function startChat() {
             if (currentMode === 'normal' || currentMode === 'silent' || isBreak) return;
+            
+            clearInterval(mentorId);
             mentorId = setInterval(() => {
+                const messages = mentorMessages[currentMode] || [];
+                if (messages.length === 0) return;
+                
                 const msg = document.createElement('div');
                 msg.className = 'message';
-                msg.textContent = currentMode === 'fokus' ? "Terus fokus, Tuan Muda." : "Waktu terus berjalan, jangan malas!";
-                document.getElementById('chat-messages').appendChild(msg);
-                document.getElementById('chat-messages').scrollTop = 9999;
-                if (document.getElementById('chat-messages').childElementCount > 5) document.getElementById('chat-messages').removeChild(document.getElementById('chat-messages').firstChild);
+                msg.textContent = messages[Math.floor(Math.random() * messages.length)];
+                
+                const chatContainer = document.getElementById('chat-messages');
+                chatContainer.appendChild(msg);
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+                
+                // Keep only last 5 messages
+                while (chatContainer.childElementCount > 5) {
+                    chatContainer.removeChild(chatContainer.firstChild);
+                }
             }, 15000);
         }
 
+        // ========== MODE SELECTION (FIXED) ==========
         function setMode(m) {
             currentMode = m;
-            document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.toggle('active', btn.textContent.toLowerCase() === m));
-            clearInterval(mentorId); if (timerId) startChat();
+            document.querySelectorAll('.mode-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.mode === m);
+            });
+            
+            clearInterval(mentorId);
+            if (timerId) startChat();
         }
 
+        // Mode button events
+        document.querySelectorAll('.mode-btn').forEach(btn => {
+            btn.addEventListener('click', () => setMode(btn.dataset.mode));
+        });
+
+        // ========== AUDIO TOGGLE ==========
         function toggleRain() {
-            const rain = document.getElementById('rainAudio');
             const btn = document.getElementById('audioToggle');
-            if (rain.paused) { rain.play(); btn.style.background = "var(--accent)"; btn.style.color = "var(--bg-dark)"; }
-            else { rain.pause(); btn.style.background = "var(--glass)"; btn.style.color = "var(--accent)"; }
+            
+            if (rainAudio.paused) {
+                safePlayAudio(rainAudio);
+                btn.style.background = "var(--accent)";
+                btn.style.color = "var(--bg-dark)";
+            } else {
+                rainAudio.pause();
+                btn.style.background = "var(--glass)";
+                btn.style.color = "var(--accent)";
+            }
         }
 
-        // --- STARS ANIMATION ---
+        document.getElementById('audioToggle').addEventListener('click', toggleRain);
+
+        // ========== KEYBOARD SHORTCUTS (NEW) ==========
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space') {
+                e.preventDefault();
+                if (timerId) {
+                    pauseTimer();
+                } else {
+                    toggleTimer();
+                }
+            }
+            if (e.key.toLowerCase() === 'p') {
+                pauseTimer();
+            }
+            if (e.key.toLowerCase() === 'r') {
+                resetTimer();
+            }
+        });
+
+        // ========== STARS ANIMATION (OPTIMIZED) ==========
         const canvas = document.getElementById('stars-canvas');
         const ctx = canvas.getContext('2d');
         let stars = [];
+
         function initStars() {
-            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-            stars = Array.from({length: 80}, () => ({ x: Math.random() * canvas.width, y: Math.random() * canvas.height, size: Math.random() * 1.5, speed: Math.random() * 0.2 }));
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            
+            // Reduce stars untuk mobile
+            const starCount = window.innerWidth < 768 ? 30 : 80;
+            
+            stars = Array.from({length: starCount}, () => ({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                size: Math.random() * 1.5,
+                speed: Math.random() * 0.2
+            }));
         }
+
         function animate() {
-            ctx.clearRect(0,0,canvas.width, canvas.height);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
             ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--star-color');
-            stars.forEach(s => { ctx.beginPath(); ctx.arc(s.x, s.y, s.size, 0, Math.PI*2); ctx.fill(); s.y -= s.speed; if(s.y<0) s.y = canvas.height; });
+            
+            stars.forEach(s => {
+                ctx.beginPath();
+                ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+                ctx.fill();
+                s.y -= s.speed;
+                if (s.y < 0) s.y = canvas.height;
+            });
+            
             requestAnimationFrame(animate);
         }
-        window.addEventListener('resize', initStars); initStars(); animate(); updateDisplay();
+
+        window.addEventListener('resize', initStars);
+        initStars();
+        animate();
+
+        // ========== LOCAL STORAGE (NEW) ==========
+        function saveStats() {
+            const stats = {
+                sessionCounter: sessionCounter,
+                lastReset: new Date().toISOString(),
+                theme: document.body.classList.contains('pagi-mode') ? 'pagi' : 'malam'
+            };
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(stats));
+        }
+
+        function loadStats() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) {
+                try {
+                    const stats = JSON.parse(saved);
+                    
+                    // Only load today's session counter
+                    const lastReset = new Date(stats.lastReset);
+                    const now = new Date();
+                    if (lastReset.toDateString() === now.toDateString()) {
+                        sessionCounter = stats.sessionCounter;
+                    } else {
+                        sessionCounter = 0; // Reset untuk hari baru
+                    }
+                    
+                    // Load theme preference
+                    if (stats.theme === 'pagi') {
+                        setTheme('pagi');
+                    }
+                } catch (e) {
+                    console.warn('⚠️ Error loading stats:', e);
+                }
+            }
+        }
+
+        // ========== INITIALIZATION ==========
+        setupAudioFiles();
+        loadStats();
+        updateDisplay();
     </script>
 </body>
 </html>
